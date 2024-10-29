@@ -1,0 +1,74 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    tty: true
+    volumes:
+      - ./frontend:/frontend
+    environment:
+      - WATCHPACK_POLLING=true
+    command: sh -c "npm run start"
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    networks:
+      - app_network
+    depends_on:
+      - db
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    tty: true
+    volumes:
+      - ./backend:/backend
+    environment:
+      - WATCHPACK_POLLING=true
+    # prismaのmigrateとseedを実行してからサーバーを起動。bcryptのrebuildも行う(環境の不一致を解消)。
+    # command: sh -c "npx prisma migrate dev --name init && npx prisma generate && npx prisma db seed && npm rebuild bcrypt --build-from-source && npm run start:dev"
+    command: sh -c "npx prisma migrate dev --name init && npx prisma generate && npx prisma db seed && npm run start:dev"
+    expose:
+      - "4000"
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+      - frontend
+    networks:
+      - app_network
+  db:
+    image: postgres:15
+    hostname: db
+    env_file:
+      - ./.env
+    environment:
+      - TZ=Asia/Tokyo
+      - POSTGRES_DB=$DB_NAME
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_HOST=$DB_HOST
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+    restart: always
+    networks:
+      - app_network
+  nginx:
+    build: 
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    restart: always
+    tty: true
+    ports: 
+      - "80:80"
+    networks: 
+      - app_network
+    depends_on:
+      - backend
+      - frontend
+      - db
+networks:
+  app_network:
+    driver: bridge
