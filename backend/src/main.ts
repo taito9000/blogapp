@@ -2,12 +2,12 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from 'src/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
-import { AllExceptionFilter } from 'src/lib/AllExceptionFilter';
+import { AllExceptionsFilter } from 'src/lib/AllExceptionsFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const httpAdapter = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new AllExceptionFilter(httpAdapter));
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.enableCors({
     origin: 'http://localhost:3000',
