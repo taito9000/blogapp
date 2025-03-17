@@ -56,14 +56,14 @@ services:
     networks:
       - app_network
   nginx:
-    build: 
+    build:
       context: .
       dockerfile: ./nginx/Dockerfile
     restart: always
     tty: true
-    ports: 
+    ports:
       - "80:80"
-    networks: 
+    networks:
       - app_network
     depends_on:
       - backend
