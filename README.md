@@ -1,11 +1,6 @@
 # blogapp
 
-
-
-## Getting started
-
-wikiから.envファイルをダウンロードし、ルートディレクトリと ./backend　配下に.envファイルを置きます。
-
+ワイヤーフレームだけ渡され、１ヶ月でローカル環境構築から、　EC2にデプロイしました。
 
 ```
 cd frontend
